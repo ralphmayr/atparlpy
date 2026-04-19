@@ -12,7 +12,7 @@ $ pip install atparlpy
 
 ## Usage
 
-The `atparlpy` module exposes each [dataset](#supported-datasets) as a separate class. Import and instantiate the class for your desired dataset. For example for the `Inquiries` ("Parlamentarische Anfragen"): 
+The `atparlpy` module exposes each [dataset](#supported-datasets) as a separate class. Import and instantiate the class for your desired dataset. For example, to get all `Inquiries` ("Parlamentarische Anfragen") in the 28. legislative period:
 
 ```python
 >>> from atparlpy import Inquiries
@@ -21,7 +21,7 @@ The `atparlpy` module exposes each [dataset](#supported-datasets) as a separate 
 >>> print(inquiries[0].betreff)
 ```
 
-To get the result as a dataframe instead, use the `AsDataFrame()` method:
+To get the result as a Pandas DataFrame instead, use the `AsDataFrame()` method:
 
 ```python
 >>> from atparlpy import Inquiries
@@ -30,7 +30,7 @@ To get the result as a dataframe instead, use the `AsDataFrame()` method:
 >>> df.to_csv('inquiries.csv', index=False)
 ```
 
-All filters can also be set via the fluent API. For example:
+All filters can be set either via the constructor or via the fluent setters. For example:
 
 ```python
 >>> from atparlpy import Inquiries
@@ -60,8 +60,8 @@ motions = Motions(gp_code="XXVII").nrbr("NR").themen(["Arbeit"]).AsList()
 * [API Documentation](https://www.parlament.gv.at/recherchieren/open-data/daten-und-lizenz/ausschussberichte/index.html)
 
 ```python
-# Beispiel: Abfrage nach allen parlamentarischen Anfragen im Bundesrat während der XXVIII. GP
-inquiries = Inquiries(gp=28, nrbr="BR").AsList()
+# Beispiel: Alle Ausschussberichte im Nationalrat in der XXV. Gesetzgebungsperiode zum Thema Arbeit
+reports = CommitteeReports(nrbr="NR", gp_code="XXV", themen="Arbeit").AsList()
 ```
 
 ### Beschlüsse (Resolutions)
@@ -69,18 +69,20 @@ inquiries = Inquiries(gp=28, nrbr="BR").AsList()
 * [API Documentation](https://www.parlament.gv.at/recherchieren/open-data/daten-und-lizenz/beschluesse/index.html)
 
 ```python
-# Beispiel: Abfrage nach allen Beschlüssen im Nationalrat während der 25. GP zum Thema Kultur
+# Beispiel: Alle Beschlüsse im Nationalrat während der 25. GP zum Thema Kultur
 resolutions = Resolutions().nrbr("NR").gp_code("XXV").themen("Kultur").AsList()
 ```
 
-### Anfragen (Inquiries)
+### Parlamentarische Anfragen (Inquiries)
 
-* [API Documentation Anfragen BR](https://www.parlament.gv.at/recherchieren/open-data/daten-und-lizenz/datensatz-schriftliche-anfragen-br/index.html)
-* [API Documentation Anfragen NR](https://www.parlament.gv.at/recherchieren/open-data/daten-und-lizenz/datensatz-schriftliche-anfragen-nr/index.html)
+* [API Documentation "Anfragen Bundesrat"](https://www.parlament.gv.at/recherchieren/open-data/daten-und-lizenz/datensatz-schriftliche-anfragen-br/index.html)
+* [API Documentation "Anfragen Nationalrat"](https://www.parlament.gv.at/recherchieren/open-data/daten-und-lizenz/datensatz-schriftliche-anfragen-nr/index.html)
 
 ```python
-# Beispiel: Abfrage nach allen parlamentarischen Anfragen im Nationalrat während der XXVIII. GP zum Thema Arbeit oder Bildung
-inquiries = Inquiries(gp=28, nrbr="NR").themen(["Arbeit", "Bildung"]).AsList()
+# Beispiel: Alle parlamentarischen Anfragen im Nationalrat während der XXVIII. GP zum Thema Arbeit oder Bildung
+inquiries = Inquiries(gp_code="XXVIII", nrbr="NR").themen(["Arbeit", "Bildung"]).AsList()
+# Beispiel: Alle parlamentarischen Anfragen im Bundesrat während der 27. GP
+inquiries = Inquiries(gp=27, nrbr="BR").AsList()
 ```
 
 ### Aktuelle Abgeordnete zum Nationalrat und Mitglieder des Bundesrats (Parliamentarians)
@@ -89,16 +91,17 @@ inquiries = Inquiries(gp=28, nrbr="NR").themen(["Arbeit", "Bildung"]).AsList()
 * [API Documentation Bundesrat](https://www.parlament.gv.at/recherchieren/open-data/daten-und-lizenz/aktuelle-mitglieder-br-/)
 
 ```python
-# Beispiel: Abfrage nach allen aktuellen Abgeordneten zum Nationalrat
+# Beispiel: Alle aktuellen Abgeordneten zum Nationalrat
 members_of_parliament = Parliamentarians(nrbr="NR").AsList()
 
 # Beispiel: Fraktionen im Nationalrat plus Anzahl der Abgeordneten
 df = Parliamentarians(nrbr="NR").AsDataFrame()
 print(df['sort_wp'].value_counts())
 
-# Beispiel: Abfrage nach dem aktuellen Präsidenten des Nationalrats
+# Beispiel: Aktuelle/r Präsident/in des Nationalrats
 president = Parliamentarians(nrbr="NR").funk("1PNR").AsList()[0]
+print(f"Präsident des NR: {president.name}")
 
-# Beispiel: Abfrage nach allen aktuellen Mitgliedern des Bundesrats
+# Beispiel: Alle aktuellen Mitglieder des Bundesrats
 members_of_the_national_council = Parliamentarians(nrbr="BR").AsList()
 ```
