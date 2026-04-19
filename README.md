@@ -1,3 +1,5 @@
+[![](https://img.shields.io/pypi/v/atparlpy)](https://pypi.org/project/atparlpy)
+
 # atparlpy
 
 This project provides a Python wrapper for the [Austrian Parliament](https://parlament.gv.at)'s [Open Data REST APIs](https://www.parlament.gv.at/recherchieren/open-data/). The API responses are available both as [dataclasses](https://docs.python.org/3/library/dataclasses.html) and as [Pandas Dataframes](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html).
