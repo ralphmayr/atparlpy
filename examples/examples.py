@@ -31,6 +31,8 @@ def main() -> None:
     # Beispiel: Abfrage nach allen parlamentarischen Anfragen im Nationalrat während der XXVIII. GP zum Thema Arbeit oder Bildung
     inquiries = Inquiries(gp=28, nrbr="NR").themen(["Arbeit", "Bildung"]).AsList()
     print(f"{len(inquiries)} Anfragen des Nationalrats gefunden.")
+    df = Inquiries(gp=28, nrbr="NR").AsDataFrame()
+    print(df['status'].value_counts())
 
     # Beispiel: Abfrage nach allen aktuellen Abgeordneten zum Nationalrat
     members_of_parliament = Parliamentarians(nrbr="NR").AsList()
