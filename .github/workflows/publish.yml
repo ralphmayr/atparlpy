@@ -16,4 +16,4 @@ jobs:
       - name: Build and Publish
         run: |
           uv build
-          uv publish
+          uv publish --trusted-publishing always
