@@ -107,3 +107,13 @@ print(f"Präsident des NR: {president.name}")
 # Beispiel: Alle aktuellen Mitglieder des Bundesrats
 members_of_the_national_council = Parliamentarians(nrbr="BR").AsList()
 ```
+
+### Plenarsitzungen (PlenarySessions)
+
+* [API Documentation](https://www.parlament.gv.at/recherchieren/open-data/daten-und-lizenz/plenarsitzungen/index.html)
+
+```python
+# Beispiel: Alle Plenarsitzungen des Nationalrats in der 28. GP
+sessions = PlenarySessions(nrbr="NR",gp=28).AsList()
+print(f"{len(sessions)} Sitzungen des Nationalrats gefunden")
+```

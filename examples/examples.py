@@ -6,7 +6,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from atparlpy import CommitteeReports, Motions, Inquiries, Resolutions, Parliamentarians
+from atparlpy import CommitteeReports, Motions, Inquiries, Resolutions, Parliamentarians, PlenarySessions
 
 
 def main() -> None:
@@ -51,6 +51,10 @@ def main() -> None:
     # Beispiel: Abfrage nach allen aktuellen Mitgliedern des Bundesrats
     members_of_the_national_council = Parliamentarians(nrbr="BR").AsList()
     print(f"{len(members_of_the_national_council)} Mitglieder des Bundesrats gefunden.")
+
+    # Beispiel: Abfrage nach allen Plenarsitzungen des Nationalrats in der 28. GP
+    sessions = PlenarySessions(nrbr="NR",gp=28).AsList()
+    print(f"{len(sessions)} Sitzungen des Nationalrats gefunden")
 
 if __name__ == "__main__":
     main()
