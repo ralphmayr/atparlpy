@@ -119,7 +119,7 @@ print(f"Präsident des NR: {president.name}")
 members_of_the_national_council = Parliamentarians(nrbr="BR").AsList()
 ```
 
-The `GetDetails()` method of a `MemberOfParliament` or `MemberOfTheNationalCouncil` object fetch the details of the respective person, and return `Person` object. For example:
+The `GetDetails()` method of a `MemberOfParliament` or `MemberOfTheNationalCouncil` object fetches the details of the respective person, and returns a `Person` object. For example:
 
 ```python
 person = Parliamentarians(nrbr="NR").funk("1PNR").AsList()[0].GetDetails()
