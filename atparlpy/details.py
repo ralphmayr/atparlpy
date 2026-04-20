@@ -52,15 +52,20 @@ class Details:
 
     pagetype: str | None = None
     meta: dict[str, Any] | None = None
-    content: dict[str, Any] | None = None
+    content: dict[str, Any] | list[Any] | None = None
     names: list[Name] | None = None
     references: list[Reference] | None = None
 
     @classmethod
     def from_api_response(cls, payload: dict[str, Any]) -> "Details":
-        content = payload.get("content") or {}
-        names = content.get("names") or []
-        references = content.get("references") or content.get("reference") or []
+        content = payload.get("content")
+        names: list[dict[str, Any]] = []
+        references: list[dict[str, Any]] = []
+
+        if isinstance(content, dict):
+            names = content.get("names") or []
+            references = content.get("references") or content.get("reference") or []
+
         return cls(
             pagetype=payload.get("pagetype"),
             meta=payload.get("meta") or {},
