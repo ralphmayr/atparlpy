@@ -3,9 +3,89 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 from typing import Any
 
-from ._filter_api import FilterApiDataset, build_payload, normalize_dimensions, row_to_kwargs
+from ._filter_api import (
+    FilterApiDataset,
+    build_detail_url,
+    build_payload,
+    fetch_json_url,
+    normalize_dimensions,
+    parse_date,
+    row_to_kwargs,
+)
+
+
+@dataclass(slots=True)
+class Mandate:
+    """Represents a single mandate entry in a person detail view."""
+
+    funktion_text: str | None = None
+    mandat: str | None = None
+    klub: str | None = None
+    wahlkreis: str | None = None
+    wahlpartei: str | None = None
+    wahlpartei_text: str | None = None
+    gremium: str | None = None
+    funktion: str | None = None
+    bez: str | None = None
+    mandat_von: date | None = None
+    mandat_bis: date | None = None
+    funktion_von: date | None = None
+    funktion_bis: date | None = None
+    aktiv: bool | None = None
+    zeitraum: str | None = None
+
+    @classmethod
+    def from_dict(cls, value: dict[str, Any]) -> "Mandate":
+        return cls(
+            funktion_text=value.get("funktion_text"),
+            mandat=value.get("mandat"),
+            klub=value.get("klub"),
+            wahlkreis=value.get("wahlkreis"),
+            wahlpartei=value.get("wahlpartei"),
+            wahlpartei_text=value.get("wahlpartei_text"),
+            gremium=value.get("gremium"),
+            funktion=value.get("funktion"),
+            bez=value.get("bez"),
+            mandat_von=parse_date(value.get("mandatVon")),
+            mandat_bis=parse_date(value.get("mandatBis")),
+            funktion_von=parse_date(value.get("funktion_von")),
+            funktion_bis=parse_date(value.get("funktion_bis")),
+            aktiv=value.get("aktiv"),
+            zeitraum=value.get("zeitraum"),
+        )
+
+
+@dataclass(slots=True)
+class Person:
+    """Represents the detailed person view."""
+
+    typ: str | None = None
+    gremium: str | None = None
+    pad_intern: Any = None
+    aktiv: bool | None = None
+    sitzplatz: str | None = None
+    image: str | None = None
+    mandate: list[Mandate] | None = None
+
+    @classmethod
+    def from_api_response(cls, payload: dict[str, Any]) -> "Person":
+        content = payload.get("content", {})
+        meta = payload.get("meta", {})
+        person_info = content.get("personInfo", {})
+        banner = content.get("banner", {})
+        mandates = banner.get("mandate") or []
+        return cls(
+            typ=person_info.get("personTyp"),
+            gremium=person_info.get("gremium"),
+            pad_intern=person_info.get("pad_intern"),
+            aktiv=person_info.get("aktiv"),
+            sitzplatz=person_info.get("sitzplatz"),
+            image=(meta.get("openGraph") or {}).get("image"),
+            mandate=[Mandate.from_dict(item) for item in mandates],
+        )
 
 
 @dataclass(slots=True)
@@ -21,6 +101,13 @@ class _ParliamentarianBase:
     @classmethod
     def from_api_row(cls, header: list[dict[str, Any]], row: list[Any]) -> "_ParliamentarianBase":
         return cls(**row_to_kwargs(header, row))
+
+    def GetDetails(self) -> Person:
+        """Return the detailed person view for this parliamentarian."""
+
+        if not self.link:
+            raise ValueError(f"{self.__class__.__name__} does not expose a detail URL")
+        return Person.from_api_response(fetch_json_url(build_detail_url(self.link)))
 
 
 @dataclass(slots=True)

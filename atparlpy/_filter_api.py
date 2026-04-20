@@ -13,6 +13,7 @@ from urllib.request import Request, urlopen
 
 API_URL = "https://www.parlament.gv.at/Filter/api/filter/data/101"
 API_QUERY = "?js=eval&showAll=true"
+PARLIAMENT_BASE_URL = "https://parlament.gv.at"
 _ROMAN_NUMERALS: tuple[tuple[int, str], ...] = (
     (1000, "M"),
     (900, "CM"),
@@ -132,6 +133,30 @@ def int_to_roman(value: int) -> str:
             parts.append(roman)
             remaining -= arabic
     return "".join(parts)
+
+
+def build_detail_url(value: str, suffix: str = "?json=true") -> str:
+    """Build a fully qualified detail URL for a Parliament record."""
+
+    url = value.strip()
+    if not url.startswith("http://") and not url.startswith("https://"):
+        url = f"{PARLIAMENT_BASE_URL}{url}"
+    if suffix:
+        url = f"{url}{'&' if '?' in url else '?'}json=true" if suffix == "?json=true" else f"{url}{suffix}"
+    return url
+
+
+def fetch_json_url(url: str, timeout: int = 30) -> dict[str, Any]:
+    """Fetch a JSON document from a GET endpoint."""
+
+    request = Request(url, headers={"Accept": "application/json"}, method="GET")
+    try:
+        with urlopen(request, timeout=timeout) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except HTTPError as exc:  # pragma: no cover - network failure path
+        raise RuntimeError(f"Detail API returned HTTP {exc.code}") from exc
+    except URLError as exc:  # pragma: no cover - network failure path
+        raise RuntimeError(f"Could not reach detail API: {exc.reason}") from exc
 
 
 def normalize_dimensions(values: list[str] | tuple[str, ...] | str | None) -> list[str] | None:

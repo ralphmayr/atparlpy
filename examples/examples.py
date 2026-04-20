@@ -14,15 +14,24 @@ def main() -> None:
     reports = CommitteeReports(nrbr="NR", gp_code="XXV", themen="Arbeit").AsList()
     print(f"{len(reports)} Ausschussberichte gefunden.")
     if reports:
-        pprint(reports[0])
+        # Beispiel: Beschreibung des ersten gefundenen Ausschussberichts
+        details = reports[0].GetDetails()
+        if details.content:
+            print(f"  Beschreibung des ersten Ausschussberichts: {details.content['description']}")
+
+        # Beispiel: Einbringer des ersten gefundenen Ausschussberichts
+        if details.names:
+            initiators = list(filter(lambda n: n.funktext == 'Eingebracht von', details.names))
+            initiator_names = ', '.join(map(lambda n: n.name, initiators))
+            print(f"  Einbringer des ersten Ausschussberichts: {initiator_names}")
 
     # Beispiel: Abfrage nach allen Anträgen im Nationalrat während der XXVII. GP zum Thema Arbeit
     motions = Motions(gp_code="XXVII").nrbr("NR").themen(["Arbeit"]).AsList()
     print(f"{len(motions)} Anträge gefunden.")
 
-    # Beispiel: Abfrage nach allen parlamentarischen Anfragen im Bundesrat während der XXVIII. GP
-    inquiries = Inquiries(gp=28, nrbr="BR").AsList()
-    print(f"{len(inquiries)} Anfragen des Bundesrats gefunden.")
+    # Beispiel: Abfrage nach allen Anträgen im Nationalrat während der 28. GP denen die Grünen zugestimmt haben
+    motions = Motions(gp=28).nrbr("NR").AsList()
+    motions = list(filter(lambda m: m.dafuer != None and 'GRÜNE' in m.dafuer, motions))
 
     # Beispiel: Abfrage nach allen Beschlüssen im Nationalrat während der 25. GP zum Thema Kultur
     resolutions = Resolutions().nrbr("NR").gp_code("XXV").themen("Kultur").AsList()
@@ -47,6 +56,10 @@ def main() -> None:
     # Beispiel: Abfrage nach dem aktuellen Präsidenten des Nationalrats
     president = Parliamentarians(nrbr="NR").funk("1PNR").AsList()[0]
     print(f"Präsident des NR: {president.name}")
+
+    person = president.GetDetails()
+    print(f"Link zum Foto: {person.image}")
+    print(f"Sitzplatz: {person.sitzplatz}")
 
     # Beispiel: Abfrage nach allen aktuellen Mitgliedern des Bundesrats
     members_of_the_national_council = Parliamentarians(nrbr="BR").AsList()

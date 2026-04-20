@@ -10,10 +10,11 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from ._filter_api import FilterApiDataset, build_payload, int_to_roman, parse_date, row_to_kwargs
+from ._record import ParliamentRecord
 
 
 @dataclass(slots=True)
-class PlenarySession:
+class PlenarySession(ParliamentRecord):
     """Represents a single plenary session row from the API."""
 
     datum: date | None = None

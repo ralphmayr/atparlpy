@@ -6,7 +6,8 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any
 
-from ._filter_api import parse_date, parse_datetime, row_to_kwargs
+from ._filter_api import build_detail_url, fetch_json_url, parse_date, parse_datetime, row_to_kwargs
+from .details import Details
 
 
 @dataclass(slots=True)
@@ -49,6 +50,7 @@ class ParliamentRecord:
     dagegen: str | None = None
     abstimmungstext: str | None = None
     abstimmungskommentar: str | None = None
+    link: str | None = None
 
     @classmethod
     def from_api_row(cls, header: list[dict[str, Any]], row: list[Any]) -> "ParliamentRecord":
@@ -64,3 +66,11 @@ class ParliamentRecord:
             },
         )
         return cls(**values)
+
+    def GetDetails(self) -> Details:
+        """Fetch the detail JSON for this record."""
+
+        detail_path = self.link or self.his_url
+        if not detail_path:
+            raise ValueError(f"{self.__class__.__name__} does not expose a detail URL")
+        return Details.from_api_response(fetch_json_url(build_detail_url(detail_path)))

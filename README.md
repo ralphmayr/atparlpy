@@ -39,6 +39,17 @@ All filters can be set either via the constructor or via the fluent setters. For
 >>> inquiries = Inquiries().gp(28).nrbr("NR").AsList()
 ```
 
+For API responses which link to a details or history page, the wrapper classes expose a `GetDetails()` method, which fetches the json representation of the respective details or history page. The `references` and `names` of the details / history page are wrapped explicitly for easy access. The `meta` and `content` properties are available as raw dictionaries. For example:
+
+```python
+>>> reports = CommitteeReports(nrbr="NR", gp_code="XXV").AsList()
+>>> details = reports[0].GetDetails()
+>>> description = details.content['description']
+>>> initiators = list(filter(lambda n: n.funktext == 'Eingebracht von', details.names))
+```
+
+---
+
 See [examples.py](examples/examples.py) for more examples.
 
 ## Convenience features
@@ -106,6 +117,14 @@ print(f"Präsident des NR: {president.name}")
 
 # Beispiel: Alle aktuellen Mitglieder des Bundesrats
 members_of_the_national_council = Parliamentarians(nrbr="BR").AsList()
+```
+
+The `GetDetails()` method of a `MemberOfParliament` or `MemberOfTheNationalCouncil` object fetch the details of the respective person, and return `Person` object. For example:
+
+```python
+person = Parliamentarians(nrbr="NR").funk("1PNR").AsList()[0].GetDetails()
+print(f"Link zum Foto: {person.image}")
+print(f"Sitzplatz: {person.sitzplatz}")
 ```
 
 ### Plenarsitzungen (PlenarySessions)
